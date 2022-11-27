@@ -1,0 +1,196 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <time.h>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+void proof(int& ch) {
+    while (!(cin >> ch) || cin.get() != '\n') {
+        cout << "Неверный ввод! Введите еще раз:\n";
+        cin.clear();
+        while (cin.get() != '\n');
+    }
+}
+
+class AListOfEmployees
+{
+protected:
+    AListOfEmployees* inf;
+    string fullname;
+    int day;
+    int month;
+    int year;
+    int size;
+    string birthdayindex = "";
+
+public:
+    AListOfEmployees();
+    ~AListOfEmployees();
+    void weekbirthday();
+    void monthbirthday();
+    void nextmonthbirthdayindex();
+};
+
+class GiftInformation : public AListOfEmployees {
+
+    GiftInformation* moneyinf;
+    int ruble;
+    int penny;
+
+public:
+    GiftInformation();
+    ~GiftInformation();
+    void nextmonthbirthday();
+};
+
+AListOfEmployees::AListOfEmployees() {
+    int n = 0;
+    cout << "Введите количество сотрудников: " << endl;
+    proof(n);
+    size = n;
+    inf = (AListOfEmployees*)calloc(size, sizeof(AListOfEmployees));
+    for (int i = 0; i < size; i++) {
+        cout << "Введите ФИО (на английском): " << endl;
+        cin.ignore();
+        getline(cin, inf[i].fullname);
+        cin.clear();
+        cout << "Введите день рождения: " << endl;
+        proof(inf[i].day);
+        cout << "Введите месяц рождения: " << endl;
+        proof(inf[i].month);
+        cout << "Введите год рождения: " << endl;
+        proof(inf[i].year);
+    }
+}
+
+AListOfEmployees::~AListOfEmployees() {
+    free(inf);
+}
+
+
+GiftInformation::GiftInformation() {
+    moneyinf = (GiftInformation*)calloc(size, sizeof(GiftInformation));
+    for (int i = 0; i < size; i++) {
+        cout << "Введите количество рублей за подарок: " << endl;
+        proof(moneyinf[i].ruble);
+        cout << "Введите копеек за подарок: " << endl;
+        proof(moneyinf[i].penny);
+    }
+}
+
+GiftInformation::~GiftInformation() {
+    free(moneyinf);
+}
+
+void AListOfEmployees::weekbirthday() {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    int range;
+    range = ltm->tm_mday + (7 - ltm->tm_wday);
+    int yearsign = 0;
+    if (((1900 + ltm->tm_year) % 4) == 0) yearsign = 1;
+    if ((1 + ltm->tm_mon == 1 || 1 + ltm->tm_mon == 3 || 1 + ltm->tm_mon == 5 || 1 + ltm->tm_mon == 7 || 1 + ltm->tm_mon == 8 || 1 + ltm->tm_mon == 10 || 1 + ltm->tm_mon == 12) && ((ltm->tm_mday + (7 - ltm->tm_wday)) > 31)) {
+        for (int i = 0; i < size; i++) {
+            if ((inf[i].day >= ltm->tm_mday && inf[i].day <= range && 1 + ltm->tm_mon == inf[i].month) || (inf[i].day <= ltm->tm_mday + (7 - ltm->tm_wday) - 31 && 1 + ltm->tm_mon + 1 == inf[i].month))
+                cout << "Дни рождения на этой неделе: " << endl << inf[i].fullname << " " << inf[i].day << "." << inf[i].month << "." << inf[i].year << endl;
+        }
+    }
+    else {
+        if ((1 + ltm->tm_mon == 4 || 1 + ltm->tm_mon == 6 || 1 + ltm->tm_mon == 9 || 1 + ltm->tm_mon == 11) && ((ltm->tm_mday + (7 - ltm->tm_wday)) > 30)) {
+            for (int i = 0; i < size; i++) {
+                if ((inf[i].day >= ltm->tm_mday && inf[i].day <= range && 1 + ltm->tm_mon == inf[i].month) || (inf[i].day <= ltm->tm_mday + (7 - ltm->tm_wday) - 30 && 1 + ltm->tm_mon + 1 == inf[i].month))
+                    cout << "Дни рождения на этой неделе: " << endl << inf[i].fullname << " " << inf[i].day << "." << inf[i].month << "." << inf[i].year << endl;
+            }
+        }
+        else {
+            if ((1 + ltm->tm_mon == 2) && ((ltm->tm_mday + (7 - ltm->tm_wday)) > 29) && yearsign == 1) {
+                for (int i = 0; i < size; i++) {
+                    if ((inf[i].day >= ltm->tm_mday && inf[i].day <= range && 1 + ltm->tm_mon == inf[i].month) || (inf[i].day <= ltm->tm_mday + (7 - ltm->tm_wday) - 29 && 1 + ltm->tm_mon + 1 == inf[i].month))
+                        cout << "Дни рождения на этой неделе: " << endl << inf[i].fullname << " " << inf[i].day << "." << inf[i].month << "." << inf[i].year << endl;
+                }
+            }
+            else {
+                if ((1 + ltm->tm_mon == 2) && ((ltm->tm_mday + (7 - ltm->tm_wday)) > 28) && yearsign == 0) {
+                    for (int i = 0; i < size; i++) {
+                        if ((inf[i].day >= ltm->tm_mday && inf[i].day <= range && 1 + ltm->tm_mon == inf[i].month) || (inf[i].day <= ltm->tm_mday + (7 - ltm->tm_wday) - 28 && 1 + ltm->tm_mon + 1 == inf[i].month))
+                            cout << "Дни рождения на этой неделе: " << endl << inf[i].fullname << " " << inf[i].day << "." << inf[i].month << "." << inf[i].year << endl;
+                    }
+                }
+                else {
+                    for (int i = 0; i < size; i++) {
+                        if (inf[i].day >= ltm->tm_mday && inf[i].day <= range && 1 + ltm->tm_mon == inf[i].month)
+                            cout << "Дни рождения на этой неделе: " << endl << inf[i].fullname << " " << inf[i].day << "." << inf[i].month << "." << inf[i].year << endl;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void AListOfEmployees::monthbirthday() {
+    int kol = 0;
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    for (int i = 0; i < size; i++) {
+        if (inf[i].day >= ltm->tm_mday && 1 + ltm->tm_mon == inf[i].month) kol++;
+    }
+    cout << "Количество именинников в этом месяце: " << endl << kol << endl;
+}
+
+void AListOfEmployees::nextmonthbirthdayindex() {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    string is;
+    for (int i = 0; i < size; i++) {
+        if (1 + ltm->tm_mon + 1 == inf[i].month) {
+            is = to_string(i);
+            birthdayindex = birthdayindex + is + " ";
+        }
+        else {
+            if (1 + ltm->tm_mon + 1 == 13) {
+                if (1 == inf[i].month) {
+                    is = to_string(i);
+                    birthdayindex = birthdayindex + is + " ";
+                }
+            }
+        }
+    }
+}
+
+void GiftInformation::nextmonthbirthday() {
+    int rublesum = 0;
+    int pennysum = 0;
+    int index;
+    string is = "";
+    for (int i = 0; i < birthdayindex.length(); i++) {
+        while (birthdayindex[i] >= '0' && birthdayindex[i] <= '9') {
+            is = is + birthdayindex[i];
+            i++;
+            }
+        istringstream(is) >> index;
+        rublesum = rublesum + moneyinf[index].ruble;
+        pennysum = pennysum + moneyinf[index].penny;
+        is = to_string(index);
+        is = "";
+    }
+    
+    if (pennysum >= 100) {
+        rublesum = rublesum + (pennysum / 100);
+        pennysum = pennysum % 100;
+    }
+    cout << "Сумма за подарки в следующем месяце: " << rublesum << " руб. " << pennysum << " коп." << endl;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    GiftInformation moneyinformation;
+    moneyinformation.weekbirthday();
+    moneyinformation.monthbirthday();
+    moneyinformation.nextmonthbirthdayindex();
+    moneyinformation.nextmonthbirthday();
+}
+
